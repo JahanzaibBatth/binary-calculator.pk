@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number System Calculator</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            animation: backgroundShift 10s infinite alternate;
+        }
+
+        @keyframes backgroundShift {
+            from {
+                background: linear-gradient(135deg, #1e3c72, #2a5298);
+            }
+            to {
+                background: linear-gradient(135deg, #2a5298, #1e3c72);
+            }
+        }
+
+        h1.glow {
+            font-size: 4em;
+            text-shadow: 0 0 20px #fff, 0 0 40px #ff00ff, 0 0 60px #ff00ff, 0 0 80px #ff00ff;
+            animation: glow 1.5s infinite alternate, bounce 2s infinite;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px #fff, 0 0 40px #ff00ff, 0 0 60px #ff00ff, 0 0 80px #ff00ff;
+            }
+            to {
+                text-shadow: 0 0 30px #fff, 0 0 50px #ff00ff, 0 0 70px #ff00ff, 0 0 90px #ff00ff;
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        input, select, button {
+            font-size: 1.5em;
+            margin: 10px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff00ff, #e600e6);
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .result {
+            margin-top: 25px;
+            font-size: 1.8em;
+            font-weight: bold;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            animation: fadeIn 1s ease-in-out, slideIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.7);
+            animation: footerGlow 3s infinite alternate;
+        }
+
+        @keyframes footerGlow {
+            from {
+                text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+            }
+            to {
+                text-shadow: 0 0 20px #ff00ff, 0 0 30px #ff00ff;
+            }
+        }
+
+        footer a {
+            color: #ff00ff;
+            text-decoration: none;
+            animation: linkPulse 2s infinite;
+        }
+
+        @keyframes linkPulse {
+            0%, 100% {
+                color: #ff00ff;
+            }
+            50% {
+                color: #e600e6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="glow">Jahanzaib's Binary Calculator</h1>
+    <p>Convert numbers between binary, decimal, hexadecimal, and octal systems. Perform binary arithmetic!</p>
+    <form id="calculator">
+        <input type="text" id="inputNumber" placeholder="Enter a number" required>
+        <select id="inputBase">
+            <option value="2">Binary</option>
+            <option value="10">Decimal</option>
+            <option value="16">Hexadecimal</option>
+            <option value="8">Octal</option>
+        </select>
+        <button type="button" onclick="convert()">Convert</button>
+    </form>
+    <form id="binaryArithmetic">
+        <input type="text" id="binary1" placeholder="Enter first binary number" required>
+        <input type="text" id="binary2" placeholder="Enter second binary number" required>
+        <button type="button" onclick="performBinaryArithmetic()">Perform Binary Arithmetic</button>
+    </form>
+    <!-- Ones and Twos Complement Form -->
+    <form id="complementForm">
+        <input type="text" id="complementInput" placeholder="Enter binary number" required>
+        <button type="button" onclick="calculateComplements()">Calculate 1's & 2's Complement</button>
+    </form>
+    <div class="result" id="result"></div>
+    <footer>
+        Made with ❤️ by <a href="#">JAHANZAIB</a>
+    </footer>
+    <script>
+        function convert() {
+            const inputNumber = document.getElementById('inputNumber').value;
+            const inputBase = parseInt(document.getElementById('inputBase').value);
+            const resultDiv = document.getElementById('result');
+
+            try {
+                const decimalValue = parseInt(inputNumber, inputBase);
+                if (isNaN(decimalValue)) throw new Error();
+                const binary = decimalValue.toString(2);
+                const decimal = decimalValue.toString(10);
+                const hexadecimal = decimalValue.toString(16).toUpperCase();
+                const octal = decimalValue.toString(8);
+
+                // Manual step-by-step process
+                let process = `<strong>Manual Conversion Steps:</strong><br>`;
+                if (inputBase === 2) {
+                    // Binary to Decimal
+                    process += `<u>Binary to Decimal:</u><br>`;
+                    let sum = 0;
+                    let steps = [];
+                    for (let i = 0; i < inputNumber.length; i++) {
+                        let bit = inputNumber[inputNumber.length - 1 - i];
+                        let val = parseInt(bit) * Math.pow(2, i);
+                        steps.unshift(`${bit} × 2<sup>${i}</sup> = ${val}`);
+                        sum += val;
+                    }
+                    process += steps.join(' + ') + `<br>`;
+                    process += `Sum = ${sum}<br><br>`;
+                } else if (inputBase === 8) {
+                    // Octal to Decimal
+                    process += `<u>Octal to Decimal:</u><br>`;
+                    let sum = 0;
+                    let steps = [];
+                    for (let i = 0; i < inputNumber.length; i++) {
+                        let digit = inputNumber[inputNumber.length - 1 - i];
+                        let val = parseInt(digit) * Math.pow(8, i);
+                        steps.unshift(`${digit} × 8<sup>${i}</sup> = ${val}`);
+                        sum += val;
+                    }
+                    process += steps.join(' + ') + `<br>`;
+                    process += `Sum = ${sum}<br><br>`;
+                } else if (inputBase === 16) {
+                    // Hexadecimal to Decimal
+                    process += `<u>Hexadecimal to Decimal:</u><br>`;
+                    let sum = 0;
+                    let steps = [];
+                    for (let i = 0; i < inputNumber.length; i++) {
+                        let digit = inputNumber[inputNumber.length - 1 - i];
+                        let num = parseInt(digit, 16);
+                        let val = num * Math.pow(16, i);
+                        steps.unshift(`${digit.toUpperCase()} × 16<sup>${i}</sup> = ${val}`);
+                        sum += val;
+                    }
+                    process += steps.join(' + ') + `<br>`;
+                    process += `Sum = ${sum}<br><br>`;
+                } else {
+                    process += `<u>Decimal to Other Bases:</u><br>`;
+                }
+
+                // Decimal to Binary (manual)
+                process += `<u>Decimal to Binary:</u><br>`;
+                let n = decimalValue;
+                let binarySteps = [];
+                let temp = n;
+                if (n === 0) {
+                    binarySteps.push("0 ÷ 2 = 0, remainder 0");
+                } else {
+                    while (temp > 0) {
+                        binarySteps.unshift(`${temp} ÷ 2 = ${Math.floor(temp / 2)}, remainder ${temp % 2}`);
+                        temp = Math.floor(temp / 2);
+                    }
+                }
+                process += binarySteps.join('<br>') + `<br>`;
+                process += `Binary: ${binary}<br><br>`;
+
+                // Decimal to Octal (manual)
+                process += `<u>Decimal to Octal:</u><br>`;
+                n = decimalValue;
+                let octalSteps = [];
+                temp = n;
+                if (n === 0) {
+                    octalSteps.push("0 ÷ 8 = 0, remainder 0");
+                } else {
+                    while (temp > 0) {
+                        octalSteps.unshift(`${temp} ÷ 8 = ${Math.floor(temp / 8)}, remainder ${temp % 8}`);
+                        temp = Math.floor(temp / 8);
+                    }
+                }
+                process += octalSteps.join('<br>') + `<br>`;
+                process += `Octal: ${octal}<br><br>`;
+
+                // Decimal to Hexadecimal (manual)
+                process += `<u>Decimal to Hexadecimal:</u><br>`;
+                n = decimalValue;
+                let hexSteps = [];
+                temp = n;
+                if (n === 0) {
+                    hexSteps.push("0 ÷ 16 = 0, remainder 0");
+                } else {
+                    while (temp > 0) {
+                        let rem = temp % 16;
+                        let remStr = rem < 10 ? rem : String.fromCharCode(55 + rem);
+                        hexSteps.unshift(`${temp} ÷ 16 = ${Math.floor(temp / 16)}, remainder ${remStr}`);
+                        temp = Math.floor(temp / 16);
+                    }
+                }
+                process += hexSteps.join('<br>') + `<br>`;
+                process += `Hexadecimal: ${hexadecimal}<br>`;
+
+                resultDiv.innerHTML = `
+                    <div style="animation: fadeIn 1s, slideIn 1s;">
+                        <p style="animation: textGlow 2s infinite;"><strong>Binary:</strong> ${binary}</p>
+                        <p style="animation: textGlow 2s infinite;"><strong>Decimal:</strong> ${decimal}</p>
+                        <p style="animation: textGlow 2s infinite;"><strong>Hexadecimal:</strong> ${hexadecimal}</p>
+                        <p style="animation: textGlow 2s infinite;"><strong>Octal:</strong> ${octal}</p>
+                        <div style="margin-top:15px;text-align:left;font-size:0.95em;background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;">
+                            ${process}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = '<div style="color: red; animation: shake 0.5s;">Invalid input. Please try again.</div>';
+            }
+        }
+
+        function performBinaryArithmetic() {
+            const binary1 = document.getElementById('binary1').value;
+            const binary2 = document.getElementById('binary2').value;
+            const resultDiv = document.getElementById('result');
+
+            try {
+                const num1 = parseInt(binary1, 2);
+                const num2 = parseInt(binary2, 2);
+                if (isNaN(num1) || isNaN(num2)) throw new Error();
+
+                const sum = (num1 + num2).toString(2);
+                const difference = (num1 - num2).toString(2);
+                const product = (num1 * num2).toString(2);
+
+                // Manual step-by-step process for addition
+                let addSteps = `<u>Binary Addition (manual):</u><br>`;
+                let a = binary1.padStart(Math.max(binary1.length, binary2.length), '0');
+                let b = binary2.padStart(Math.max(binary1.length, binary2.length), '0');
+                let carry = 0;
+                let result = '';
+                let stepTable = `<table style="font-size:0.9em;"><tr><th>Bit</th><th>${a}</th><th>+</th><th>${b}</th><th>Carry In</th><th>Sum</th><th>Carry Out</th></tr>`;
+                for (let i = a.length - 1; i >= 0; i--) {
+                    let bitA = parseInt(a[i]);
+                    let bitB = parseInt(b[i]);
+                    let s = bitA + bitB + carry;
+                    let sumBit = s % 2;
+                    let carryOut = s > 1 ? 1 : 0;
+                    stepTable += `<tr><td>${i + 1}</td><td>${bitA}</td><td>+</td><td>${bitB}</td><td>${carry}</td><td>${sumBit}</td><td>${carryOut}</td></tr>`;
+                    result = sumBit + result;
+                    carry = carryOut;
+                }
+                if (carry) {
+                    result = carry + result;
+                    stepTable += `<tr><td>Carry</td><td colspan="6">${carry}</td></tr>`;
+                }
+                stepTable += `</table>`;
+                addSteps += stepTable;
+                addSteps += `<br>Result: ${result}<br>`;
+
+                // Manual subtraction (using two's complement)
+                let subSteps = `<u>Binary Subtraction (manual):</u><br>`;
+                if (num1 >= num2) {
+                    let minuend = a;
+                    let subtrahend = b;
+                    // Find two's complement of subtrahend
+                    let ones = '';
+                    for (let i = 0; i < subtrahend.length; i++) {
+                        ones += subtrahend[i] === '0' ? '1' : '0';
+                    }
+                    let twos = '';
+                    let carry = 1;
+                    for (let i = ones.length - 1; i >= 0; i--) {
+                        let bit = ones[i] === '1' ? 1 : 0;
+                        let sum = bit + carry;
+                        twos = (sum % 2) + twos;
+                        carry = sum > 1 ? 1 : 0;
+                    }
+                    subSteps += `1. 1's complement of ${subtrahend}: ${ones}<br>`;
+                    subSteps += `2. Add 1 to get 2's complement: ${ones} + 1 = ${twos}<br>`;
+                    // Add to minuend
+                    let sumResult = '';
+                    carry = 0;
+                    for (let i = minuend.length - 1; i >= 0; i--) {
+                        let bitA = parseInt(minuend[i]);
+                        let bitB = parseInt(twos[i]);
+                        let s = bitA + bitB + carry;
+                        sumResult = (s % 2) + sumResult;
+                        carry = s > 1 ? 1 : 0;
+                    }
+                    subSteps += `3. Add to minuend: ${minuend} + ${twos} = ${sumResult} (ignore carry out)<br>`;
+                    subSteps += `Result: ${sumResult} (which is ${num1 - num2} in decimal)<br>`;
+                } else {
+                    subSteps += `Cannot subtract: first number is smaller than second (result would be negative).<br>`;
+                }
+
+                // Manual multiplication
+                let mulSteps = `<u>Binary Multiplication (manual):</u><br>`;
+                let multiplicand = a;
+                let multiplier = b;
+                let rows = [];
+                for (let i = multiplier.length - 1; i >= 0; i--) {
+                    let bit = multiplier[i];
+                    let row = bit === '1' ? multiplicand + '0'.repeat(multiplier.length - 1 - i) : '0'.repeat(multiplicand.length + multiplier.length - 1 - i);
+                    rows.push(row);
+                    mulSteps += `Step ${multiplier.length - i}: ${multiplicand} × ${bit} = ${row}<br>`;
+                }
+                let sumRows = rows.reduce((acc, curr) => {
+                    let maxLen = Math.max(acc.length, curr.length);
+                    acc = acc.padStart(maxLen, '0');
+                    curr = curr.padStart(maxLen, '0');
+                    let carry = 0;
+                    let res = '';
+                    for (let i = maxLen - 1; i >= 0; i--) {
+                        let s = parseInt(acc[i]) + parseInt(curr[i]) + carry;
+                        res = (s % 2) + res;
+                        carry = s > 1 ? 1 : 0;
+                    }
+                    if (carry) res = carry + res;
+                    return res;
+                });
+                mulSteps += `Sum all rows: ${rows.join(' + ')} = ${sumRows}<br>`;
+
+                resultDiv.innerHTML = `
+                    <div style="animation: fadeIn 1s, slideIn 1s;">
+                        <p style="animation: textGlow 2s infinite;"><strong>Sum:</strong> ${sum}</p>
+                        <p style="animation: textGlow 2s infinite;"><strong>Difference:</strong> ${difference}</p>
+                        <p style="animation: textGlow 2s infinite;"><strong>Product:</strong> ${product}</p>
+                        <div style="margin-top:15px;text-align:left;font-size:0.95em;background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;">
+                            <strong>Manual Steps:</strong><br>
+                            ${addSteps}<br>
+                            ${subSteps}<br>
+                            ${mulSteps}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = '<div style="color: red; animation: shake 0.5s;">Invalid binary input. Please try again.</div>';
+            }
+        }
+
+        function calculateComplements() {
+            const input = document.getElementById('complementInput').value.trim();
+            const resultDiv = document.getElementById('result');
+
+            // Validate input: must be a non-empty string of only 0s and 1s
+            if (!/^[01]+$/.test(input)) {
+                resultDiv.innerHTML = '<div style="color: red; animation: shake 0.5s;">Please enter a valid binary number.</div>';
+                return;
+            }
+
+            // 1's complement: flip each bit
+            let onesComplement = '';
+            let onesProcess = '';
+            for (let i = 0; i < input.length; i++) {
+                let flipped = input[i] === '0' ? '1' : '0';
+                onesComplement += flipped;
+                onesProcess += `Bit ${i + 1}: ${input[i]} → ${flipped}<br>`;
+            }
+
+            // 2's complement: add 1 to the 1's complement
+            let twosComplement = '';
+            let carry = 1;
+            let twosProcess = `Start from right, add 1 to 1's complement:<br>`;
+            for (let i = onesComplement.length - 1; i >= 0; i--) {
+                let bit = onesComplement[i] === '1' ? 1 : 0;
+                let sum = bit + carry;
+                twosComplement = (sum % 2) + twosComplement;
+                twosProcess += `Bit ${i + 1}: ${onesComplement[i]} + ${carry} = ${sum} → ${sum % 2}, carry=${sum > 1 ? 1 : 0}<br>`;
+                carry = sum > 1 ? 1 : 0;
+            }
+
+            resultDiv.innerHTML = `
+                <div style="animation: fadeIn 1s, slideIn 1s;">
+                    <p style="animation: textGlow 2s infinite;"><strong>1's Complement:</strong> ${onesComplement}</p>
+                    <div style="margin-bottom:10px;text-align:left;font-size:0.95em;background:rgba(0,0,0,0.2);padding:8px;border-radius:8px;">
+                        <strong>Manual Steps:</strong><br>
+                        Flip each bit:<br>${onesProcess}
+                    </div>
+                    <p style="animation: textGlow 2s infinite;"><strong>2's Complement:</strong> ${twosComplement}</p>
+                    <div style="text-align:left;font-size:0.95em;background:rgba(0,0,0,0.2);padding:8px;border-radius:8px;">
+                        <strong>Manual Steps:</strong><br>${twosProcess}
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+    <style>
+        @keyframes textGlow {
+            0%, 100% {
+                text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+            }
+            50% {
+                text-shadow: 0 0 20px #ff00ff, 0 0 30px #ff00ff;
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            50% {
+                transform: translateX(5px);
+            }
+            75% {
+                transform: translateX(-5px);
+            }
+        }
+    </style>
+</body>
+</html>
